@@ -1,13 +1,27 @@
 const Blockchain = require("./blockchain");
 
-const pokemonCoin = new Blockchain();
+const bitcoin = new Blockchain();
 
-pokemonCoin.createNewBlock(2390, "HASH", "ANOTHERHASH");
-pokemonCoin.createNewTransaction(100, "ALF", "BUBU");
-pokemonCoin.createNewBlock(123, "5435", "ASDE@!#");
-pokemonCoin.createNewTransaction(100, "ALF", "BUBU");
-pokemonCoin.createNewTransaction(300, "ALF", "BUBU");
-pokemonCoin.createNewTransaction(2000, "ALF", "BUBU");
-pokemonCoin.createNewBlock(132323, "ASDASD435", "GERKJGER");
+const previousBlockHash = "OINK";
+const currentBlockData = [
+  {
+    amount: 10,
+    sender: "LALAMON",
+    recipient: "Bubub",
+  },
+  {
+    amount: 30,
+    sender: "ASD",
+    recipient: "DSSDD",
+  },
+  {
+    amount: 220,
+    sender: "GKDLF",
+    recipient: "KDLSKD",
+  },
+];
 
-console.log(pokemonCoin);
+const nonce = 100;
+
+bitcoin.hashBlock(previousBlockHash, currentBlockData, nonce);
+console.log(bitcoin.hashBlock(previousBlockHash, currentBlockData, nonce));
