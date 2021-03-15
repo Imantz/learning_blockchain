@@ -25,6 +25,26 @@ app.post("/transaction", function (req, res) {
   res.json({ note: `transaction will be added in block ${blockIndex}` });
 });
 
+app.post("/transaction/broadcast", function (req, res) {
+  const newTransaction = bitcoin.createNewTransaction(
+    req.body.amount,
+    req.body.sender,
+    req.body.recipient
+  );
+  bitcoin.addTransactionToPendingTransactions(newTransaction);
+
+  const requestPromises = [];
+
+  bitcoin.networkNodes.forEach((networkNodeUrl) => {
+    requestPromises.push(
+      axios.post(networkNodeUrl + "/transaction", newTransaction)
+    );
+  });
+
+  Promise.all(requestPromises).then((_) => {
+    res.json({ note: "Transaction created and broadcast successfully" });
+  });
+});
 app.get("/mine", function (req, res) {
   const lastBlock = bitcoin.getLastBlock();
   const previousBlockHash = lastBlock["hash"];
