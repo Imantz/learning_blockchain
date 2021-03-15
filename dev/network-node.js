@@ -15,14 +15,13 @@ app.use(bodyParser.urlencoded({ extended: "false" }));
 app.get("/blockchain", function (req, res) {
   res.send(bitcoin);
 });
-app.post("/transaction", function (req, res) {
-  const blockIndex = bitcoin.createNewTransaction(
-    req.body.amount,
-    req.body.sender,
-    req.body.recipient
-  );
 
-  res.json({ note: `transaction will be added in block ${blockIndex}` });
+app.post("/transaction", function (req, res) {
+  const newTransaction = req.body;
+  const blockIndex = bitcoin.addTransactionToPendingTransactions(
+    newTransaction
+  );
+  res.json({ note: `Transaction will be added in block ${blockIndex}.` });
 });
 
 app.post("/transaction/broadcast", function (req, res) {
@@ -81,12 +80,12 @@ app.post("/register-and-broadcast-node", function (req, res) {
   });
 
   Promise.all(regNodesPromises)
-    .then((data) => {
+    .then((_) => {
       axios.post(newNodeUrl + "/register-nodes-bulk", {
         allNetworkNodes: [...bitcoin.networkNodes, bitcoin.currentNodeUrl],
       });
     })
-    .then((data) => {
+    .then((_) => {
       res.json({ note: "New node registered with network succesfully." });
     });
 });
@@ -97,9 +96,8 @@ app.post("/register-node", function (req, res) {
   const notCurrentNode = bitcoin.currentNodeUrl !== newNodeUrl;
   if (nodeNotAlreadyPresent && notCurrentNode) {
     bitcoin.networkNodes.push(newNodeUrl);
-    res.json({ note: "new node registered successfully with node" });
   }
-  res.json({ note: "already have" });
+  res.json({ note: "new node registered successfully with node" });
 });
 
 app.post("/register-nodes-bulk", function (req, res) {
