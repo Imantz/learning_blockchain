@@ -44,6 +44,7 @@ app.post("/transaction/broadcast", function (req, res) {
     res.json({ note: "Transaction created and broadcast successfully" });
   });
 });
+
 app.get("/mine", function (req, res) {
   const lastBlock = bitcoin.getLastBlock();
   const previousBlockHash = lastBlock["hash"];
@@ -57,14 +58,50 @@ app.get("/mine", function (req, res) {
     currentBlockData,
     nonce
   );
-
-  bitcoin.createNewTransaction(12.5, "00", nodeAddress);
-
   const newBlock = bitcoin.createNewBlock(nonce, previousBlockHash, blockHash);
-  res.json({
-    node: "New block mined successfully",
-    block: newBlock,
+
+  const requestPromises = [];
+  bitcoin.networkNodes.forEach((networkNodeUrl) => {
+    requestPromises.push(
+      axios.post(networkNodeUrl + "/receive-new-block", { newBlock })
+    );
   });
+
+  Promise.all(requestPromises)
+    .then(() =>
+      axios.post(bitcoin.currentNodeUrl + "/transaction/broadcast", {
+        amount: 12.5,
+        sender: "00",
+        recipient: nodeAddress,
+      })
+    )
+    .then(() =>
+      res.json({
+        node: "New block mined & broadcast successfully",
+        block: newBlock,
+      })
+    );
+});
+
+app.post("/receive-new-block", function (req, res) {
+  const newBlock = req.body.newBlock;
+  const lastBlock = bitcoin.getLastBlock();
+  const correctHash = lastBlock.hash === newBlock.previousBlockHash;
+  const correctIndex = lastBlock["index"] + 1 === newBlock["index"];
+
+  if (correctHash && correctIndex) {
+    bitcoin.chain.push(newBlock);
+    bitcoin.pendingTransactions = [];
+    res.json({
+      note: "New block received and accepted",
+      newBlock,
+    });
+  } else {
+    res.json({
+      note: "New block rejected",
+      newBlock,
+    });
+  }
 });
 
 app.post("/register-and-broadcast-node", function (req, res) {
@@ -80,12 +117,12 @@ app.post("/register-and-broadcast-node", function (req, res) {
   });
 
   Promise.all(regNodesPromises)
-    .then((_) => {
+    .then(() => {
       axios.post(newNodeUrl + "/register-nodes-bulk", {
         allNetworkNodes: [...bitcoin.networkNodes, bitcoin.currentNodeUrl],
       });
     })
-    .then((_) => {
+    .then(() => {
       res.json({ note: "New node registered with network succesfully." });
     });
 });
