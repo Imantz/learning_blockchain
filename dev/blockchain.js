@@ -83,39 +83,38 @@ Blockchain.prototype.proofOfWork = function (
 Blockchain.prototype.chainIsValid = function (blockchain) {
   let validChain = true;
 
-  for (leti = 1; i < blockchain.length; i++) {
+  for (var i = 1; i < blockchain.length; i++) {
     const currentBlock = blockchain[i];
-    const prevBlock = blockchain[i] - 1;
+    const prevBlock = blockchain[i - 1];
     const blockHash = this.hashBlock(
-      prevBlock.hash,
+      prevBlock["hash"],
       {
         transactions: currentBlock["transactions"],
         index: currentBlock["index"],
       },
       currentBlock["nonce"]
     );
-    if (blockHash.substring(0, 4) !== "0000") {
+    if (blockHash.substring(0, 4) !== "0000") validChain = false;
+    if (currentBlock["previousBlockHash"] !== prevBlock["hash"])
       validChain = false;
-    }
-    if (currentBlock["previousBlockHash"] !== prevBlock["hash"]) {
-      validChain = false;
-    }
+
+    console.log("   prev hash =>", prevBlock["hash"]);
+    console.log("current hash =>", currentBlock["hash"]);
   }
 
   const genesisBlock = blockchain[0];
   const correctNonce = genesisBlock["nonce"] === 100;
-  const correctPrevBlockHash = genesisBlock["previousBlockHash"] === "0";
+  const correctPreviousBlockHash = genesisBlock["previousBlockHash"] === "0";
   const correctHash = genesisBlock["hash"] === "0";
-  const correcTTransactions = genesisBlock["transactions"].length === 0;
+  const correctTransactions = genesisBlock["transactions"].length === 0;
 
   if (
     !correctNonce ||
-    !correctPrevBlockHash ||
+    !correctPreviousBlockHash ||
     !correctHash ||
-    !correcTTransactions
-  ) {
+    !correctTransactions
+  )
     validChain = false;
-  }
 
   return validChain;
 };
