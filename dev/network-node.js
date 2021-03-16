@@ -191,6 +191,12 @@ app.get("/consensus", function (req, res) {
   });
 });
 
+app.get("/block/:blockHash", function (req, res) {});
+
+app.get("/transaction/:transactionId", function (req, res) {});
+
+app.get("/address/:address", function (req, res) {});
+
 app.listen(PORT, function () {
   console.log("Listening on port " + PORT);
 });
