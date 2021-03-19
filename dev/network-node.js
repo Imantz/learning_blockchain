@@ -209,7 +209,12 @@ app.get("/transaction/:transactionId", function (req, res) {
   });
 });
 
-app.get("/address/:address", function (req, res) {});
+app.get("/address/:address", function (req, res) {
+  const address = req.params.address;
+  const addressData = bitcoin.getAddressData(address);
+
+  res.json({ addressData });
+});
 
 app.listen(PORT, function () {
   console.log("Listening on port " + PORT);
