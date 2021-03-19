@@ -56,12 +56,12 @@ Blockchain.prototype.addTransactionToPendingTransactions = function (
 };
 
 Blockchain.prototype.hashBlock = function (
-  previouseBlockHash,
+  previousBlockHash,
   currentBlockData,
   nonce
 ) {
   const dataAsString =
-    previouseBlockHash + nonce.toString() + JSON.stringify(currentBlockData);
+    previousBlockHash + nonce.toString() + JSON.stringify(currentBlockData);
   const hash = sha256(dataAsString);
   return hash;
 };
@@ -97,9 +97,6 @@ Blockchain.prototype.chainIsValid = function (blockchain) {
     if (blockHash.substring(0, 4) !== "0000") validChain = false;
     if (currentBlock["previousBlockHash"] !== prevBlock["hash"])
       validChain = false;
-
-    console.log("   prev hash =>", prevBlock["hash"]);
-    console.log("current hash =>", currentBlock["hash"]);
   }
 
   const genesisBlock = blockchain[0];
@@ -122,9 +119,7 @@ Blockchain.prototype.chainIsValid = function (blockchain) {
 Blockchain.prototype.getBlock = function (blockHash) {
   let correctBlock = null;
   this.chain.forEach((block) => {
-    if (block.hash === blockHash) {
-      correctBlock = block;
-    }
+    if (block.hash === blockHash) correctBlock = block;
   });
   return correctBlock;
 };

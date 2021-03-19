@@ -109,23 +109,24 @@ const coupleOfMoreTransactions = () => {
 
 const main = () => {
   setTimeout(registerNodes, 500);
-  setTimeout(mineTwoBlocks, 600);
-  setTimeout(broadcastTransactions, 700);
-  setTimeout(mine3004block, 800);
-  setTimeout(moreTransactions, 900);
-  setTimeout(mine3001block, 1000);
-  setTimeout(coupleOfMoreTransactions, 1100);
-  setTimeout(mine3001block, 1200);
-  setTimeout(mine3004block, 1300);
+  setTimeout(mineTwoBlocks, 700);
+  setTimeout(broadcastTransactions, 900);
+  setTimeout(mine3004block, 1100);
+  setTimeout(moreTransactions, 1300);
+  setTimeout(mine3001block, 1500);
+  setTimeout(coupleOfMoreTransactions, 1700);
+  setTimeout(mine3001block, 1900);
+  setTimeout(mine3004block, 2100);
   setTimeout(() => {
     axios.get("http://localhost:3002/blockchain").then((r) => {
       console.log(r.data);
 
       console.log("-----------");
       console.log("chain is valid? : ", bitcoin.chainIsValid(r.data.chain));
+      console.log("chain length : ", r.data.chain.length);
     });
-  }, 1500);
+  }, 2500);
 };
 
-//1 sec after nodemon start nodes
-setTimeout(main, 1000);
+//2 sec after nodemon start nodes
+setTimeout(main, 2000);
